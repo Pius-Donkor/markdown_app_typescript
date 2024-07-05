@@ -1,15 +1,16 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect, ChangeEvent } from "react";
 import styled from "styled-components";
 import Navbar from "./ui/Navbar";
 import Sidebar from "./ui/Sidebar";
 import Markdown from "./features/Markdown";
-import { formatDate } from "./utils/helper";
+import { formatDate, generateUniqueId } from "./utils/helper";
 import Preview from "./features/Preview";
 
 interface Document {
   createdAt: string;
   name: string;
   content: string;
+  id: string;
 }
 
 interface MainContentProps {
@@ -54,19 +55,26 @@ const App = () => {
     }
   }, [currentDocument]);
 
+  useEffect(() => {
+ const updatedDoc={...currentDocument,content:input};
+ setCurrentDocument(updatedDoc)
+  }, [input,currentDocument]);
+
   const saveToLocalStorage = (docs: Document[]) => {
     localStorage.setItem("markdown-documents", JSON.stringify(docs));
   };
 
-  const handleSave = () => {
+  function handleSave() {
     if (currentDocument) {
       const updatedDocuments = documents.map((doc) =>
-        doc === currentDocument ? { ...currentDocument, content: input } : doc
+        doc.id === currentDocument.id
+          ? { ...currentDocument, content: input }
+          : doc
       );
       setDocuments(updatedDocuments);
       saveToLocalStorage(updatedDocuments);
     }
-  };
+  }
 
   const handleDelete = () => {
     const updatedDocuments = documents.filter((doc) => doc !== currentDocument);
@@ -80,6 +88,7 @@ const App = () => {
       createdAt: formatDate(),
       name: "untitled-document.md",
       content: "",
+      id: generateUniqueId(),
     };
     setDocuments([...documents, newDocument]);
     saveToLocalStorage([...documents, newDocument]);
@@ -91,11 +100,11 @@ const App = () => {
     setSidebarVisible(false);
   };
 
-  const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleNameChange = (event: ChangeEvent<HTMLInputElement>) => {
     if (currentDocument) {
       const updatedDocument = { ...currentDocument, name: event.target.value };
       const updatedDocuments = documents.map((doc) =>
-        doc === currentDocument ? updatedDocument : doc
+        doc.id === currentDocument.id ? updatedDocument : doc
       );
       setDocuments(updatedDocuments);
       setCurrentDocument(updatedDocument);
@@ -122,18 +131,19 @@ const App = () => {
 
       <MainContent shifted={sidebarVisible}>
         {currentDocument && (
-          <Markdown
-            currentDocument={currentDocument}
-            input={input}
-            setInput={setInput}
-            fullPreview={fullPreview}
-          />
+          <>
+            <Markdown
+              input={input}
+              setInput={setInput}
+              fullPreview={fullPreview}
+            />
+            <Preview
+              input={input}
+              setFullPreview={setFullPreview}
+              fullPreview={fullPreview}
+            />
+          </>
         )}
-        <Preview
-          input={input}
-          setFullPreview={setFullPreview}
-          fullPreview={fullPreview}
-        />
       </MainContent>
     </AppContainer>
   );
