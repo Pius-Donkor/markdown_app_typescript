@@ -1,3 +1,6 @@
+import BlockParagraph from "../ui/BlockParagraph";
+import Paragraph from "../ui/Paragraph";
+
 // Function to parse markdown text
 export const parseMarkdown = (text: string): JSX.Element[] => {
   const lines = text.split("\n");
@@ -5,127 +8,86 @@ export const parseMarkdown = (text: string): JSX.Element[] => {
   let currentParagraph = "";
   let inSeaBlueDiv = false;
 
-  lines.forEach((line, index) => {
-    if (line.startsWith("######")) {
-      if (currentParagraph) {
-        elements.push(<p key={elements.length}>{currentParagraph}</p>);
-        currentParagraph = "";
-      }
-      elements.push(<h6 key={index}>{line.slice(6)}</h6>);
-    } else if (line.startsWith("#####")) {
-      if (currentParagraph) {
-        elements.push(<p key={elements.length}>{currentParagraph}</p>);
-        currentParagraph = "";
-      }
-      elements.push(<h5 key={index}>{line.slice(5)}</h5>);
-    } else if (line.startsWith("####")) {
-      if (currentParagraph) {
-        elements.push(<p key={elements.length}>{currentParagraph}</p>);
-        currentParagraph = "";
-      }
-      elements.push(<h4 key={index}>{line.slice(4)}</h4>);
-    } else if (line.startsWith("###")) {
-      if (currentParagraph) {
-        elements.push(<p key={elements.length}>{currentParagraph}</p>);
-        currentParagraph = "";
-      }
-      elements.push(<h3 key={index}>{line.slice(3)}</h3>);
-    } else if (line.startsWith("##")) {
-      if (currentParagraph) {
-        elements.push(<p key={elements.length}>{currentParagraph}</p>);
-        currentParagraph = "";
-      }
-      elements.push(<h2 key={index}>{line.slice(2)}</h2>);
-    } else if (line.startsWith("#")) {
-      if (currentParagraph) {
-        elements.push(<p key={elements.length}>{currentParagraph}</p>);
-        currentParagraph = "";
-      }
-      elements.push(<h1 key={index}>{line.slice(1)}</h1>);
-    } else if (/^\d+\. /.test(line)) {
-      if (currentParagraph) {
-        elements.push(<p key={elements.length}>{currentParagraph}</p>);
-        currentParagraph = "";
-      }
-      elements.push(<p key={index}>{line}</p>);
-    } else if (line.startsWith("- ")) {
-      if (currentParagraph) {
-        elements.push(<p key={elements.length}>{currentParagraph}</p>);
-        currentParagraph = "";
-      }
-      elements.push(
-        <p key={index} style={{ listStyleType: "circle", color: "red" }}>
-          {line.slice(2)}
-        </p>
-      );
-    } else if (line.startsWith("> ")) {
-      if (currentParagraph) {
-        elements.push(<p key={elements.length}>{currentParagraph}</p>);
-        currentParagraph = "";
-      }
-      elements.push(
-        <div
-          key={index}
-          style={{ backgroundColor: "blue", padding: "10px", color: "white" }}
-        >
-          {line.slice(2)}
-        </div>
-      );
-    } else if (line.startsWith("---")) {
+  const pushParagraph = () => {
+    if (currentParagraph) {
       if (inSeaBlueDiv) {
         elements.push(
-          <div
-            key={index}
-            style={{
-              backgroundColor: "lightseagreen",
-              padding: "10px",
-              color: "white",
-            }}
-          >
+          <BlockParagraph key={elements.length}>
             {currentParagraph}
-          </div>
+          </BlockParagraph>
         );
-        currentParagraph = "";
-        inSeaBlueDiv = false;
+      } else {
+        elements.push(
+          <Paragraph key={elements.length}>{currentParagraph}</Paragraph>
+        );
+      }
+      currentParagraph = "";
+      inSeaBlueDiv = false;
+    }
+  };
+
+  lines.forEach((line, index) => {
+    const trimmedLine = line.trim();
+
+    if (trimmedLine === "") {
+      pushParagraph();
+      elements.push(<br key={index} />);
+    } else if (/^######/.test(trimmedLine)) {
+      pushParagraph();
+      elements.push(<h6 key={index}>{trimmedLine.slice(6)}</h6>);
+    } else if (/^#####/.test(trimmedLine)) {
+      pushParagraph();
+      elements.push(<h5 key={index}>{trimmedLine.slice(5)}</h5>);
+    } else if (/^####/.test(trimmedLine)) {
+      pushParagraph();
+      elements.push(<h4 key={index}>{trimmedLine.slice(4)}</h4>);
+    } else if (/^###/.test(trimmedLine)) {
+      pushParagraph();
+      elements.push(<h3 key={index}>{trimmedLine.slice(3)}</h3>);
+    } else if (/^##/.test(trimmedLine)) {
+      pushParagraph();
+      elements.push(<h2 key={index}>{trimmedLine.slice(2)}</h2>);
+    } else if (/^#/.test(trimmedLine)) {
+      pushParagraph();
+      elements.push(<h1 key={index}>{trimmedLine.slice(1)}</h1>);
+    } else if (/^\d+\./.test(trimmedLine)) {
+      pushParagraph();
+      elements.push(
+        <Paragraph type="numberPoint" key={index}>
+          <span>{trimmedLine.match(/^\d+\./)?.[0]}</span>
+          {trimmedLine.slice(trimmedLine.indexOf(".") + 1)}
+        </Paragraph>
+      );
+    } else if (/^-/.test(trimmedLine) && !/^---/.test(trimmedLine)) {
+      pushParagraph();
+      elements.push(
+        <Paragraph type="point" key={index}>
+          {trimmedLine.slice(1)}
+        </Paragraph>
+      );
+    } else if (/^>/.test(trimmedLine)) {
+      pushParagraph();
+      elements.push(
+        <BlockParagraph type="bordered" key={index}>
+          {trimmedLine.slice(1)}
+        </BlockParagraph>
+      );
+    } else if (/^---$/.test(trimmedLine)) {
+      if (inSeaBlueDiv) {
+        pushParagraph();
       } else {
         inSeaBlueDiv = true;
       }
     } else {
-      if (inSeaBlueDiv) {
-        if (currentParagraph) {
-          currentParagraph += ` ${line}`;
-        } else {
-          currentParagraph = line;
-        }
+      if (currentParagraph) {
+        currentParagraph += ` ${trimmedLine}`;
       } else {
-        if (currentParagraph) {
-          currentParagraph += ` ${line}`;
-        } else {
-          currentParagraph = line;
-        }
+        currentParagraph = trimmedLine;
       }
     }
   });
 
-  if (currentParagraph) {
-    if (inSeaBlueDiv) {
-      elements.push(
-        <div
-          key={elements.length}
-          style={{
-            backgroundColor: "lightseagreen",
-            padding: "10px",
-            color: "white",
-          }}
-        >
-          {currentParagraph}
-        </div>
-      );
-    } else {
-      elements.push(<p key={elements.length}>{currentParagraph}</p>);
-    }
-  }
-
+  pushParagraph();
   return elements;
 };
 
@@ -150,7 +112,7 @@ export function formatDate(): string {
   const month = monthNames[date.getMonth()];
   const year = date.getFullYear();
 
-  return `${day} ${month} ${year}`;
+  return ` ${day} ${month} ${year}`;
 }
 
 export function generateUniqueId(): string {
