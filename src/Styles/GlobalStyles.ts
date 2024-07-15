@@ -15,12 +15,15 @@ const GlobalStyles = createGlobalStyle`
       --color-white-100: #f5f5f5;
       --color-orange-0: #e46643;
       --color-orange-100: #f39765;
+      --color-darkH-300: #35393f;
+
     }
 
     &.dark-mode {
-      --color-white-100: #1d1f22;
-      --color-white-0: #151619;
-      --color-dark-300: #c1c4cb;
+  --color-white-d-100: #1d1f22;
+  --color-white-d-0: #151619;
+  --color-dark-d-300: #c1c4cb;
+  --color-darkH-300: #ffffff;
     }
   }
 `;
