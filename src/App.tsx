@@ -5,6 +5,9 @@ import Sidebar from "./ui/Sidebar";
 import Markdown from "./features/Markdown";
 import { formatDate, generateUniqueId } from "./utils/helper";
 import Preview from "./features/Preview";
+import { DarkModeProvider } from "./Context/DarkModeContext";
+import GlobalStyles from "./Styles/GlobalStyles";
+import DeleteModal from "./ui/DeleteModal";
 
 interface Document {
   createdAt: string;
@@ -39,12 +42,14 @@ const App = () => {
   const [currentDocument, setCurrentDocument] = useState<Document | null>(null);
   const [sidebarVisible, setSidebarVisible] = useState<boolean>(false);
   const [fullPreview, setFullPreview] = useState<boolean>(false);
+  const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
 
   useEffect(() => {
     const savedDocuments = JSON.parse(
       localStorage.getItem("markdown-documents") || "[]"
     ) as Document[];
     setDocuments(savedDocuments);
+    setCurrentDocument(savedDocuments?.[0] || null);
   }, []);
 
   useEffect(() => {
@@ -55,10 +60,9 @@ const App = () => {
     }
   }, [currentDocument]);
 
-  useEffect(() => {
- const updatedDoc={...currentDocument,content:input};
- setCurrentDocument(updatedDoc)
-  }, [input,currentDocument]);
+  const handleShowModal = () => {
+    setShowDeleteModal(!showDeleteModal);
+  };
 
   const saveToLocalStorage = (docs: Document[]) => {
     localStorage.setItem("markdown-documents", JSON.stringify(docs));
@@ -80,7 +84,7 @@ const App = () => {
     const updatedDocuments = documents.filter((doc) => doc !== currentDocument);
     setDocuments(updatedDocuments);
     saveToLocalStorage(updatedDocuments);
-    setCurrentDocument(null);
+    setCurrentDocument(updatedDocuments?.[0] || null);
   };
 
   const handleCreate = () => {
@@ -102,7 +106,11 @@ const App = () => {
 
   const handleNameChange = (event: ChangeEvent<HTMLInputElement>) => {
     if (currentDocument) {
-      const updatedDocument = { ...currentDocument, name: event.target.value };
+      const updatedDocument = {
+        ...currentDocument,
+        name: event.target.value,
+        content: input,
+      };
       const updatedDocuments = documents.map((doc) =>
         doc.id === currentDocument.id ? updatedDocument : doc
       );
@@ -113,39 +121,50 @@ const App = () => {
   };
 
   return (
-    <AppContainer>
-      <Navbar
-        currentDocument={currentDocument}
-        handleDelete={handleDelete}
-        handleSave={handleSave}
-        setSidebarVisible={setSidebarVisible}
-        sidebarVisible={sidebarVisible}
-        handleNameChange={handleNameChange}
-      />
-      <Sidebar
-        documents={documents}
-        sidebarVisible={sidebarVisible}
-        handleCreate={handleCreate}
-        handleSelectDocument={handleSelectDocument}
-      />
-
-      <MainContent shifted={sidebarVisible}>
-        {currentDocument && (
-          <>
-            <Markdown
-              input={input}
-              setInput={setInput}
-              fullPreview={fullPreview}
-            />
-            <Preview
-              input={input}
-              setFullPreview={setFullPreview}
-              fullPreview={fullPreview}
-            />
-          </>
+    <DarkModeProvider>
+      <GlobalStyles />
+      <AppContainer>
+        {showDeleteModal && (
+          <DeleteModal
+            handleDelete={handleDelete}
+            currentDocumentName={currentDocument?.name}
+            handleShowModal={handleShowModal}
+          />
         )}
-      </MainContent>
-    </AppContainer>
+        <Navbar
+          currentDocument={currentDocument}
+          handleShowModal={handleShowModal}
+          handleSave={handleSave}
+          setSidebarVisible={setSidebarVisible}
+          sidebarVisible={sidebarVisible}
+          handleNameChange={handleNameChange}
+        />
+        <Sidebar
+          documents={documents}
+          sidebarVisible={sidebarVisible}
+          handleCreate={handleCreate}
+          handleSelectDocument={handleSelectDocument}
+        />
+
+        <MainContent shifted={sidebarVisible}>
+          {currentDocument && (
+            <>
+              <Markdown
+                input={input}
+                setInput={setInput}
+                fullPreview={fullPreview}
+                setFullPreview={setFullPreview}
+              />
+              <Preview
+                input={input}
+                setFullPreview={setFullPreview}
+                fullPreview={fullPreview}
+              />
+            </>
+          )}
+        </MainContent>
+      </AppContainer>
+    </DarkModeProvider>
   );
 };
 
