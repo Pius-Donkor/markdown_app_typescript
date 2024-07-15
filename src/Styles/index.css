@@ -11,7 +11,7 @@
 
 :root {
   /* light */
-  --color-dark-0: #151619;
+  /* --color-dark-0: #151619;
   --color-dark-100: #1d1f22;
   --color-dark-200: #2b2d31;
   --color-dark-300: #35393f;
@@ -24,12 +24,12 @@
   --color-orange-0: #e46643;
   --color-orange-100: #f39765;
   --color-overlay-0: #8a8a8cce;
-  --color-overlay-100: #494b50d0;
+  --color-overlay-100: #494b50d0; */
 
   /* dark mode */
-  /* --color-white-100: #1d1f22;
-  --color-white-0: #151619;
-  --color-dark-300: #c1c4cb; */
+  /* --color-white-d-100: #1d1f22;
+  --color-white-d-0: #151619;
+  --color-dark-d-300: #c1c4cb; */
 
   /* topography */
   --roboto-slap: "Roboto Slap", sans-serif;
@@ -48,6 +48,7 @@ button {
   border: none;
   text-transform: capitalize;
 }
+
 h1,
 h2,
 h3,
@@ -57,6 +58,7 @@ h6 {
   font-family: "Roboto Slab", serif;
   font-weight: 700;
   text-transform: capitalize;
+  color: var(--color-darkH-300);
 }
 
 h1 {
@@ -82,7 +84,6 @@ h6 {
 p {
   word-wrap: break-word;
   white-space: normal;
-  overflow: hidden;
 }
 /* .heading-medium {
   font-size: 15px;
