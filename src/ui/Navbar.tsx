@@ -3,7 +3,8 @@ import Icon from "./Icon";
 import DocumentInput from "./DocumentInput";
 import Button from "./Button";
 import { ChangeEvent } from "react";
-
+import useGetScreen from "../hooks/useGetScreen";
+import { RiDeleteBinLine } from "react-icons/ri";
 // navbar
 const StyledNavbar = styled.nav.withConfig({
   shouldForwardProp: (prop) => prop !== "shifted",
@@ -21,6 +22,12 @@ const StyledNavbar = styled.nav.withConfig({
 // image tag for the icons
 const OpenCloseIcon = styled.img<{ open?: boolean }>`
   width: ${({ open }) => (open ? "30px" : "25px")};
+  &:hover {
+    background-color: var(--color-orange-0);
+  }
+  @media screen and (max-width: 700px) {
+    width: ${({ open }) => (open ? "25px" : "20px")};
+  }
 `;
 
 // markdown heading
@@ -33,12 +40,31 @@ const StyledHeading = styled.span`
 `;
 
 // button for containing icons
-const ButtonIcon = styled.button`
+const ButtonIcon = styled.button<{ $ismobile?: boolean }>`
   background-color: var(--color-dark-300);
   height: 4rem;
   width: 4.5rem;
   border: none;
   cursor: pointer;
+  transition: background-color 300ms;
+  &:hover {
+    background-color: var(--color-orange-0);
+  }
+
+  @media screen and (max-width: 700px) {
+    height: ${({ $ismobile }) => ($ismobile ? "fit-content" : "4rem")};
+    width: ${({ $ismobile }) => ($ismobile ? "fit-content" : "4rem")};
+  }
+`;
+
+const DeleteIcon = styled(RiDeleteBinLine)`
+  font-size: 30px;
+  color: var(--color-grey-100);
+  transition: color 300ms;
+  cursor: pointer;
+  &:hover {
+    color: var(--color-orange-0);
+  }
 `;
 
 const SubContainer = styled.div`
@@ -52,7 +78,7 @@ interface NavbarProps {
   sidebarVisible: boolean;
   currentDocument: { name: string; createdAt: string; content: string } | null;
   setSidebarVisible: (visible: boolean) => void;
-  handleDelete: () => void;
+  handleShowModal: () => void;
   handleSave: () => void;
   handleNameChange: (parameter: ChangeEvent<HTMLInputElement>) => void;
 }
@@ -61,11 +87,11 @@ function Navbar({
   sidebarVisible,
   currentDocument,
   setSidebarVisible,
-  handleDelete,
+  handleShowModal,
   handleSave,
   handleNameChange,
 }: NavbarProps) {
-  console.log(sidebarVisible);
+  const { isMobile } = useGetScreen();
   return (
     <StyledNavbar shifted={sidebarVisible}>
       <SubContainer>
@@ -80,7 +106,7 @@ function Navbar({
             />
           )}
         </ButtonIcon>
-        <StyledHeading>Markdown</StyledHeading>
+        {!isMobile && <StyledHeading>Markdown</StyledHeading>}
         {currentDocument && (
           <DocumentInput
             currentDocument={currentDocument}
@@ -92,13 +118,9 @@ function Navbar({
       <div>
         {currentDocument && (
           <SubContainer>
-            <Icon
-              style={{ color: "var(--color-grey-300)" }}
-              src="/assets/icon-delete.svg"
-              onClick={handleDelete}
-            />
-            <Button onClick={handleSave}>
-              <Icon src="/assets/icon-save.svg" /> Save change
+            <DeleteIcon onClick={handleShowModal} />
+            <Button onClick={handleSave} $ismobile={isMobile}>
+              <Icon src="/assets/icon-save.svg" /> {!isMobile && "Save change"}
             </Button>
           </SubContainer>
         )}
