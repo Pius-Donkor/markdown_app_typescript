@@ -1,7 +1,9 @@
 import styled, { css } from "styled-components";
 import { parseMarkdown } from "../utils/helper";
 import ContentBar from "../ui/ContentBar";
-import Icon from "../ui/Icon";
+import useGetScreen from "../hooks/useGetScreen";
+import PreviewScreenIcons from "../ui/PreviewScreenIcons";
+import { useDarkModeContext } from "../Context/DarkModeContext";
 
 const fullScreenStyles = css`
   width: 100%;
@@ -10,7 +12,6 @@ const fullScreenStyles = css`
 
 const EditorSection = styled.div`
   width: 50%;
-  overflow-y: auto;
   height: calc(100vh - 60px); /* Adjust height based on navbar height */
 `;
 
@@ -25,19 +26,28 @@ const PreviewSection = styled(EditorSection).withConfig({
 
 const PreviewWrapper = styled.div.withConfig({
   shouldForwardProp: (prop) => prop !== "isfullscreen",
-})<{ isfullscreen: boolean }>`
+})<{ isfullscreen: boolean; $isDark: boolean }>`
   display: flex;
+  background-color: ${({ $isDark }) =>
+    $isDark ? "var(--color-white-d-0)" : "var(--color-white-0)"};
   flex-direction: column;
+  overflow-y: auto;
   align-items: center;
   width: ${({ isfullscreen }) => (isfullscreen ? "50%" : "100%")};
-  height: calc(100%-3rem);
+  height: 100%;
+  padding-bottom: 20px;
+  @media screen and (max-width: 1000px) {
+    width: 100%;
+  }
 `;
 
 const StyledPreview = styled.div`
   width: 100%;
-  height: calc(100%-3rem);
+  height: 100%;
   padding: 20px;
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 `;
 
 interface PreviewProps {
@@ -50,23 +60,17 @@ export default function Preview({
   fullPreview,
   setFullPreview,
 }: PreviewProps) {
-  return (
+  const { isMobile } = useGetScreen();
+  const { isDarkMode } = useDarkModeContext();
+  return isMobile && !fullPreview ? (
+    ""
+  ) : (
     <PreviewSection isfullscreen={fullPreview}>
       <ContentBar>
         <span>preview</span>
-        {fullPreview ? (
-          <Icon
-            onClick={() => setFullPreview(!fullPreview)}
-            src="/assets/icon-hide-preview.svg"
-          />
-        ) : (
-          <Icon
-            onClick={() => setFullPreview(!fullPreview)}
-            src="/assets/icon-show-preview.svg"
-          />
-        )}
+        <PreviewScreenIcons state={fullPreview} setState={setFullPreview} />
       </ContentBar>
-      <PreviewWrapper isfullscreen={fullPreview}>
+      <PreviewWrapper $isDark={isDarkMode} isfullscreen={fullPreview}>
         <StyledPreview>{parseMarkdown(input)}</StyledPreview>
       </PreviewWrapper>
     </PreviewSection>
