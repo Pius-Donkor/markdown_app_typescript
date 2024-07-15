@@ -1,6 +1,7 @@
 import styled from "styled-components";
 import Button from "./Button";
 import DocumentInput from "./DocumentInput";
+import LightDark from "./LightDark";
 
 const StyledSidebar = styled.div.withConfig({
   shouldForwardProp: (prop) => prop !== "visible",
@@ -20,9 +21,17 @@ const StyledSidebar = styled.div.withConfig({
     visible ? "translateX(0)" : "translateX(-250px)"};
   transition: transform 0.3s ease;
   overflow-y: auto;
+  overflow-x: hidden;
   padding: 25px;
   z-index: 1000;
 `;
+
+const LightDarkWrapper = styled.div`
+  width: 100%;
+  position: absolute;
+  bottom: 2rem;
+`;
+
 const SideBarHeading = styled.p`
   font-size: var(--font-size-medium);
   color: var(--color-grey-100);
@@ -68,6 +77,10 @@ export default function Sidebar({
           onClick={() => handleSelectDocument(doc)}
         />
       ))}
+
+      <LightDarkWrapper>
+        <LightDark />
+      </LightDarkWrapper>
     </StyledSidebar>
   );
 }
