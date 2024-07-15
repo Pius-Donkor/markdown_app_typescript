@@ -1,6 +1,7 @@
 import styled, { css } from "styled-components";
 import Icon from "./Icon";
 import { ChangeEvent } from "react";
+import useGetScreen from "../hooks/useGetScreen";
 
 const listStyles = css`
   cursor: pointer;
@@ -16,6 +17,15 @@ const StyledContainer = styled.div.withConfig({
   border-left: ${({ islist }) =>
     islist ? "transparent" : "solid var(--color-grey-0) 1.5px"};
   padding-left: ${({ islist }) => (islist ? "0" : "10px")};
+  transition: color 300ms;
+  &:hover .documentName {
+    color: var(--color-orange-0);
+  }
+  @media screen and (max-width: 700px) {
+    border-left: transparent;
+    padding-left: 0;
+    gap: ${({ islist }) => (islist ? "1rem" : "0.5rem")};
+  }
 `;
 const StyledInputContainer = styled.div`
   display: flex;
@@ -33,14 +43,14 @@ const StyledName = styled.span`
   transition: border-bottom 0.2s ease;
 `;
 
-const StyledInput = styled.input`
+const StyledInput = styled.input<{ $ismobile?: boolean }>`
   border: transparent;
   background-color: transparent;
   font-size: var(--font-size-medium);
   color: var(--color-white-100);
   padding: 5px 0px;
   outline: none;
-  min-width: 15rem;
+  width: ${({ $ismobile }) => ($ismobile ? "10rem" : "15rem")};
   transition: border-bottom 0.2s ease;
   &::placeholder {
     font-size: var(--font-size-medium);
@@ -76,6 +86,7 @@ function DocumentInput({
   onClick = () => {},
   isList = false,
 }: DocumentInputProps) {
+  const { isMobile } = useGetScreen();
   return (
     <StyledContainer islist={isList} onClick={onClick}>
       {notInput ? (
@@ -83,15 +94,16 @@ function DocumentInput({
           <Icon type="small" src="/assets/icon-document.svg" />
           <StyledInputContainer>
             <StyledSpan>{date}</StyledSpan>
-            <StyledName>{documentName}</StyledName>
+            <StyledName className="documentName">{documentName}</StyledName>
           </StyledInputContainer>
         </>
       ) : (
         <>
           <Icon type="small" src="/assets/icon-document.svg" />
           <StyledInputContainer>
-            <StyledSpan>{currentDocument?.name}</StyledSpan>
+            {!isMobile && <StyledSpan>{currentDocument?.name}</StyledSpan>}
             <StyledInput
+              $ismobile={isMobile}
               placeholder={currentDocument?.name}
               value={currentDocument?.name}
               onChange={handleNameChange}
