@@ -19,7 +19,7 @@ const EditorSection = styled.div<{ $ismobile?: boolean; $isDark?: boolean }>`
 
 const Editor = styled.textarea<{ $isDark?: boolean }>`
   color: ${({ $isDark }) =>
-    $isDark ? "var(--color-grey-d-300)" : "var(--color-dark-0)"};
+    $isDark ? "var(--color-grey-200)" : "var(--color-dark-0)"};
   width: 100%;
   height: calc(100% - 3rem);
   border: transparent;
@@ -50,7 +50,7 @@ export default function Markdown({
   if (isMobile && !fullPreview)
     return (
       <EditorSection $isDark={isDarkMode} $ismobile={isMobile}>
-        <ContentBar>
+        <ContentBar $isDark={isDarkMode}>
           <span>markdown</span>
           <PreviewScreenIcons state={fullPreview} setState={setFullPreview} />
         </ContentBar>
@@ -66,7 +66,7 @@ export default function Markdown({
     ""
   ) : (
     <EditorSection $isDark={isDarkMode}>
-      <ContentBar>
+      <ContentBar $isDark={isDarkMode}>
         <span>markdown</span>
       </ContentBar>
       <Editor
