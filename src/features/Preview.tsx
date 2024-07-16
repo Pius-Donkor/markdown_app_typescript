@@ -17,11 +17,21 @@ const EditorSection = styled.div`
 
 const PreviewSection = styled(EditorSection).withConfig({
   shouldForwardProp: (prop) => prop !== "isfullscreen",
-})<{ isfullscreen: boolean }>`
-  border-left: 1px solid var(--color-grey-300);
-  ${({ isfullscreen }) => (isfullscreen ? fullScreenStyles : "")}
+})<{ isfullscreen: boolean; $isDark?: boolean }>`
   align-items: center;
   flex-direction: column;
+
+  /* state styles */
+  /*border color change  */
+  border-left: 1px solid
+    ${({ $isDark }) =>
+      $isDark ? "var(--color-grey-0)" : "var(--color-grey-300)"};
+
+  /* style change based on whether the preview is fullscreen */
+  ${({ isfullscreen }) => (isfullscreen ? fullScreenStyles : "")}
+  /* background color change */
+  background-color: ${({ $isDark }) =>
+    $isDark ? "var(--color-dark-0)" : "var(--color-white-0)"};
 `;
 
 const PreviewWrapper = styled.div.withConfig({
@@ -65,13 +75,13 @@ export default function Preview({
   return isMobile && !fullPreview ? (
     ""
   ) : (
-    <PreviewSection isfullscreen={fullPreview}>
-      <ContentBar>
+    <PreviewSection $isDark={isDarkMode} isfullscreen={fullPreview}>
+      <ContentBar $isDark={isDarkMode}>
         <span>preview</span>
         <PreviewScreenIcons state={fullPreview} setState={setFullPreview} />
       </ContentBar>
       <PreviewWrapper $isDark={isDarkMode} isfullscreen={fullPreview}>
-        <StyledPreview>{parseMarkdown(input)}</StyledPreview>
+        <StyledPreview>{parseMarkdown(input, isDarkMode)}</StyledPreview>
       </PreviewWrapper>
     </PreviewSection>
   );
