@@ -8,6 +8,7 @@ import Preview from "./features/Preview";
 import { DarkModeProvider } from "./Context/DarkModeContext";
 import GlobalStyles from "./Styles/GlobalStyles";
 import DeleteModal from "./ui/DeleteModal";
+import toast, { Toaster } from "react-hot-toast";
 
 interface Document {
   createdAt: string;
@@ -77,6 +78,7 @@ const App = () => {
       );
       setDocuments(updatedDocuments);
       saveToLocalStorage(updatedDocuments);
+      toast.success("Document saved successfully");
     }
   }
 
@@ -85,6 +87,7 @@ const App = () => {
     setDocuments(updatedDocuments);
     saveToLocalStorage(updatedDocuments);
     setCurrentDocument(updatedDocuments?.[0] || null);
+    toast.success("Document deleted successfully");
   };
 
   const handleCreate = () => {
@@ -123,6 +126,7 @@ const App = () => {
   return (
     <DarkModeProvider>
       <GlobalStyles />
+      <Toaster position="top-center" reverseOrder={false} />
       <AppContainer>
         {showDeleteModal && (
           <DeleteModal
