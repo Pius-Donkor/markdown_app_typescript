@@ -30,7 +30,7 @@ const Paragraph = styled.p<ParagraphType>`
   ${({ type = "normal" }) => paragraphStyles[type]}
   position: relative;
   color: ${({ $isDark }) =>
-    $isDark ? "var(--color-grey-d-100)" : "var(--color-grey-100)"};
+    $isDark ? "var(--color-grey-200)" : "var(--color-grey-100)"};
   line-height: var(--line-height);
   font-family: var(--roboto-slap);
   font-size: var(--font-size-small);
