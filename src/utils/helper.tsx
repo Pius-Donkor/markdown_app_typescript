@@ -2,7 +2,10 @@ import BlockParagraph from "../ui/BlockParagraph";
 import Paragraph from "../ui/Paragraph";
 
 // Function to parse markdown text
-export const parseMarkdown = (text: string): JSX.Element[] => {
+export const parseMarkdown = (
+  text: string,
+  isDark?: boolean
+): JSX.Element[] => {
   const lines = text.split("\n");
   const elements: JSX.Element[] = [];
   let currentParagraph = "";
@@ -12,13 +15,15 @@ export const parseMarkdown = (text: string): JSX.Element[] => {
     if (currentParagraph) {
       if (inSeaBlueDiv) {
         elements.push(
-          <BlockParagraph key={elements.length}>
+          <BlockParagraph $isDark={isDark} key={elements.length}>
             {currentParagraph}
           </BlockParagraph>
         );
       } else {
         elements.push(
-          <Paragraph key={elements.length}>{currentParagraph}</Paragraph>
+          <Paragraph $isDark={isDark} key={elements.length}>
+            {currentParagraph}
+          </Paragraph>
         );
       }
       currentParagraph = "";
@@ -53,7 +58,7 @@ export const parseMarkdown = (text: string): JSX.Element[] => {
     } else if (/^\d+\./.test(trimmedLine)) {
       pushParagraph();
       elements.push(
-        <Paragraph type="numberPoint" key={index}>
+        <Paragraph $isDark={isDark} type="numberPoint" key={index}>
           <span>{trimmedLine.match(/^\d+\./)?.[0]}</span>
           {trimmedLine.slice(trimmedLine.indexOf(".") + 1)}
         </Paragraph>
@@ -61,14 +66,14 @@ export const parseMarkdown = (text: string): JSX.Element[] => {
     } else if (/^-/.test(trimmedLine) && !/^---/.test(trimmedLine)) {
       pushParagraph();
       elements.push(
-        <Paragraph type="point" key={index}>
+        <Paragraph $isDark={isDark} type="point" key={index}>
           {trimmedLine.slice(1)}
         </Paragraph>
       );
     } else if (/^>/.test(trimmedLine)) {
       pushParagraph();
       elements.push(
-        <BlockParagraph type="bordered" key={index}>
+        <BlockParagraph $isDark={isDark} type="bordered" key={index}>
           {trimmedLine.slice(1)}
         </BlockParagraph>
       );
