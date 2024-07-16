@@ -37,7 +37,12 @@ const DarkModeProvider = ({ children }: DarkModeProviderProps) => {
   );
 };
 
-const useDarkModeContext = () => {
+interface DarkContextType {
+  isDarkMode: boolean;
+  setIsDarkMode: (parameter: boolean) => void;
+}
+
+const useDarkModeContext = (): DarkContextType => {
   const context = useContext(DarkModeContext);
   if (context === undefined) {
     throw new Error(
